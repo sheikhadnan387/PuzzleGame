@@ -1,4 +1,4 @@
-import React, {createRef, FC, useEffect, useState} from 'react';
+import React, {createRef, FC, useEffect, useState, RefObject} from 'react';
 import {TouchableOpacity, View, Text, Alert, TextInput} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Constants from '../../constants';
@@ -11,6 +11,7 @@ import ROUTES from '../../utils/routes';
 import {useToast} from 'react-native-toast-notifications';
 import {Theme} from '../../utils/theme';
 
+// shuffle the array of words
 const shuffleArray = (array: string[]): string[] => {
   let currentIndex = array.length,
     randomIndex;
@@ -24,6 +25,7 @@ const shuffleArray = (array: string[]): string[] => {
   }
   return array;
 };
+// calculate score according to words
 const calculateScore = (word: string): number => {
   return word.length + Math.floor(word.length / 3);
 };
@@ -32,10 +34,10 @@ const PlayGame: FC<StackProps> = ({route}) => {
   const {id, name} = route.params?.category;
   const toast = useToast();
   const category: Category | undefined = Constants.categories.find(
-    cat => cat.id === id,
+    category => category?.id === id,
   );
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
-  const [inputRefs, setInputRefs] = useState<React.RefObject<TextInput>[]>([]);
+  const [inputRefs, setInputRefs] = useState<RefObject<TextInput>[]>([]);
   const [score, setScore] = useState<number>(0);
   const [shuffledAnswer, setShuffledAnswer] = useState<string[]>([]);
   const [userAnswer, setUserAnswer] = useState<string[]>([]);
@@ -53,6 +55,7 @@ const PlayGame: FC<StackProps> = ({route}) => {
     );
   }, [currentQuestionIndex, category]);
 
+  // when press on shuffle words
   const onLetterPress = (letter: string) => {
     const index = userAnswer.indexOf('');
     if (index !== -1) {
@@ -65,7 +68,7 @@ const PlayGame: FC<StackProps> = ({route}) => {
       }
     }
   };
-
+  // when one input fill then it move another one
   const handleTextChange = (text: string, index: number) => {
     const newUserAnswers = [...userAnswer];
     newUserAnswers[index] = text.toUpperCase();
@@ -75,17 +78,21 @@ const PlayGame: FC<StackProps> = ({route}) => {
       inputRefs[index + 1].current?.focus();
     }
   };
+
+  // skip the Question
   const onSkip = () => {
     if (!category) return;
     setCurrentQuestionIndex(
       (currentQuestionIndex + 1) % category.questions.length,
     );
   };
+
+  // Submit his answer and compare with given input
   const onSubmit = async () => {
     if (!category) return;
     else {
       const answer =
-        category.questions[currentQuestionIndex].answer.toUpperCase();
+        category?.questions[currentQuestionIndex].answer.toUpperCase();
       if (userAnswer.join('').length <= 0) return;
       if (userAnswer.join('') === answer) {
         const wordScore = calculateScore(answer);
@@ -94,7 +101,7 @@ const PlayGame: FC<StackProps> = ({route}) => {
           type: 'success',
         });
         setCurrentQuestionIndex(
-          (currentQuestionIndex + 1) % category.questions.length,
+          (currentQuestionIndex + 1) % category?.questions?.length,
         );
       } else {
         toast.show('Incorrect Answer | Game is Over', {

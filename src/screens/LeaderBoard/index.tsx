@@ -11,6 +11,7 @@ const LeaderBoard: FC = () => {
   const insets = useSafeAreaInsets();
   const [leaderboard, setLeaderboard] = useState<LeaderboardItem[]>([]);
 
+  // fetch the data from async storage
   useEffect(() => {
     const fetchLeaderboard = async () => {
       const leaderboardData: LeaderboardItem[] = await GetLeaderBoard();
@@ -24,10 +25,10 @@ const LeaderBoard: FC = () => {
     <LinearGradient
       colors={Constants.Gradient}
       style={[styles.container, {paddingTop: Math.max(insets.top, 16)}]}>
-      <Text style={styles.header}>Leader board</Text>
+      <Text style={styles.header}>Leader Board</Text>
       <FlatList
         data={leaderboard}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item, index) => index?.toString()}
         ListHeaderComponent={() => (
           <View style={styles.headerRow}>
             <Text style={styles.header_text}>No.</Text>
